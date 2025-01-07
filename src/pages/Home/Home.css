@@ -1,0 +1,81 @@
+.home {
+    text-align: center;
+    margin: 20px;
+}
+
+.pokemon-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    /* 10 columns per row */
+    gap: 20px;
+    /* Space between cards */
+    margin: 20px 0;
+    justify-content: center;
+    /* Center grid content */
+}
+
+
+.pokemon-card:hover {
+    transform: translateY(-5px);
+    /* Slight hover effect */
+}
+
+.button-container {
+    width: 100%;
+    position: absolute;
+    bottom: 10px;
+    /* Align button at the bottom of the card */
+    left: 0;
+    text-align: center;
+}
+
+.view-details-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    /* Gradient background */
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    /* Rounded button */
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.view-details-btn:hover {
+    background: linear-gradient(to right, #2575fc, #6a11cb);
+    transform: scale(1.05);
+    /* Slight zoom effect */
+}
+
+/* Pagination styles */
+.pagination {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pagination button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.pagination button:hover {
+    background-color: #45a049;
+}
+
+.pagination button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+}
+
+.pagination button.active {
+    background-color: #2196f3;
+}
