@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import Home from './pages/Home/Home';
 import PokemonDetails from './pages/PokemonDetails/PokemonDetails';
-import Favorites from './pages/Favorites';
+import Favorites from './pages/Favorites/Favorites';
 
 function App() {
   return (

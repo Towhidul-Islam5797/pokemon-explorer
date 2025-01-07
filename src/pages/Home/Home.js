@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PokemonCard from '../../components/PokemonCard/PokemonCard';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import './Home.css';
@@ -6,8 +7,11 @@ import './Home.css';
 const Home = () => {
     const [pokemonList, setPokemonList] = useState([]);
     const [filteredPokemon, setFilteredPokemon] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const pokemonsPerPage = 100; // 10 rows × 10 Pokémon per row
+    const [searchParams, setSearchParams] = useSearchParams();
+    const pokemonsPerPage = 104; // 10 rows × 10 Pokémon per row
+
+    // Get the current page from the URL, default to 1
+    const currentPage = parseInt(searchParams.get('page')) || 1;
 
     useEffect(() => {
         // Fetch all Pokémon
@@ -32,12 +36,12 @@ const Home = () => {
             pokemon.name.toLowerCase().includes(query.toLowerCase())
         );
         setFilteredPokemon(filtered);
-        setCurrentPage(1); // Reset to the first page after search
+        setSearchParams({ page: 1 }); // Reset to the first page after search
     };
 
     // Pagination handlers
     const handlePageChange = (page) => {
-        setCurrentPage(page);
+        setSearchParams({ page }); // Update the page in the URL
     };
 
     // Calculate paginated Pokémon

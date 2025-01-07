@@ -5,7 +5,7 @@
 
 .pokemon-grid {
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     /* 10 columns per row */
     gap: 20px;
     /* Space between cards */
