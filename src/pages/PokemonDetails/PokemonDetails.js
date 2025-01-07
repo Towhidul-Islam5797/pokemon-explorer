@@ -8,8 +8,8 @@ const PokemonDetails = () => {
     const [moves, setMoves] = useState([]);
     const [evolutionChain, setEvolutionChain] = useState([]);
     const [error, setError] = useState(false);
+    const [isFavorited, setIsFavorited] = useState(false); // State to track favorite status
 
-    const navigate = useNavigate();
 
     // Type color mapping
     const typeColors = {
@@ -32,6 +32,7 @@ const PokemonDetails = () => {
         steel: '#B7B7CE',
         fairy: '#D685AD',
     };
+    
 
     useEffect(() => {
         const fetchPokemonDetails = async () => {
@@ -61,6 +62,9 @@ const PokemonDetails = () => {
                 );
 
                 setMoves(movesDetails);
+                const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+                const alreadyFavorited = favorites.some((fav) => fav.name === data.name);
+                setIsFavorited(alreadyFavorited);
             } catch (err) {
                 console.error('Error fetching Pokémon details:', err);
                 setError(true);
@@ -102,6 +106,21 @@ const PokemonDetails = () => {
         fetchEvolutionChain();
     }, [name]);
 
+    const handleToggleFavorite = () => {
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        if (isFavorited) {
+            const updatedFavorites = favorites.filter((fav) => fav.name !== pokemonDetails.name);
+            localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+        } else {
+            const newFavorite = {
+                name: pokemonDetails.name,
+                image: pokemonDetails.sprites.other['official-artwork'].front_default,
+            };
+            localStorage.setItem('favorites', JSON.stringify([...favorites, newFavorite]));
+        }
+        setIsFavorited(!isFavorited);
+    };
+
     if (error) {
         return <p>Unable to load Pokémon details. Please try again later.</p>;
     }
@@ -122,10 +141,6 @@ const PokemonDetails = () => {
 
     return (
         <div className="pokemon-details-container">
-            {/* button back */}
-            <button onClick={() => navigate(-1)} className="back-button">
-                Back
-            </button>
             <div className="pokemon-details">
                 <h1 className="pokemon-name">{pokemonDetails.name}</h1>
                 <p className="pokemon-id">#{pokemonDetails.id.toString().padStart(3, '0')}</p>
@@ -134,6 +149,12 @@ const PokemonDetails = () => {
                     alt={pokemonDetails.name}
                     className="pokemon-image"
                 />
+                <button
+                    className={`favorite-button ${isFavorited ? 'favorited' : ''}`}
+                    onClick={handleToggleFavorite}
+                >
+                    ♥
+                </button>
 
                 <div className="details-grid">
                     <div className="details-row">
@@ -232,10 +253,6 @@ const PokemonDetails = () => {
                     </tbody>
                 </table>
             </div>
-            {/* button next */}
-            <button onClick={() => navigate(-1)} className="next-button">
-                next
-            </button>
         </div>
     );
 };
