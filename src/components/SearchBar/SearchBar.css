@@ -2,15 +2,16 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .search-bar {
-    width: 60%;
+    width: 30%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px 0 0 5px;
-    /* Rounded corners for left side */
     outline: none;
     font-size: 16px;
 }
@@ -21,7 +22,6 @@
     color: white;
     border: none;
     border-radius: 0 5px 5px 0;
-    /* Rounded corners for right side */
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
@@ -30,4 +30,30 @@
 
 .search-button:hover {
     background-color: #45a049;
+}
+
+.sort-dropdown,
+.filter-dropdown {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.clear-button {
+    padding: 10px 15px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.clear-button:hover {
+    background-color: #e53935;
 }

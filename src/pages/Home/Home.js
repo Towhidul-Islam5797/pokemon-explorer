@@ -7,31 +7,54 @@ import './Home.css';
 const Home = () => {
     const [pokemonList, setPokemonList] = useState([]);
     const [filteredPokemon, setFilteredPokemon] = useState([]);
+    const [pokemonTypes, setPokemonTypes] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
-    const pokemonsPerPage = 104; // 10 rows × 10 Pokémon per row
+    const pokemonsPerPage = 104;
 
-    // Get the current page from the URL, default to 1
     const currentPage = parseInt(searchParams.get('page')) || 1;
 
     useEffect(() => {
-        // Fetch all Pokémon
         const fetchAllPokemon = async () => {
-            const totalPokemon = 1302; // Set the maximum number of Pokémon in PokeAPI
+            const totalPokemon = 1302; // Total Pokémon in PokéAPI
             const response = await fetch(
                 `https://pokeapi.co/api/v2/pokemon?limit=${totalPokemon}`
             );
             const data = await response.json();
-            setPokemonList(data.results);
-            setFilteredPokemon(data.results); // Initialize filtered list
+
+            // Fetch additional details for each Pokémon
+            const detailedPokemonList = await Promise.all(
+                data.results.map(async (pokemon) => {
+                    const detailsResponse = await fetch(pokemon.url);
+                    const details = await detailsResponse.json();
+                    return {
+                        name: pokemon.name,
+                        url: pokemon.url,
+                        id: details.id,
+                        types: details.types.map((type) => type.type.name), // Get types
+                    };
+                })
+            );
+
+            setPokemonList(detailedPokemonList);
+            setFilteredPokemon(detailedPokemonList); // Initialize filtered list
+        };
+
+        const fetchPokemonTypes = async () => {
+            const response = await fetch(`https://pokeapi.co/api/v2/type`);
+            const data = await response.json();
+            const types = data.results.map((type) => type.name);
+            setPokemonTypes(types.filter((type) => type !== "unknown")); // Exclude "unknown" type
         };
 
         fetchAllPokemon().catch((err) =>
             console.error('Error fetching all Pokémon:', err)
         );
+        fetchPokemonTypes().catch((err) =>
+            console.error('Error fetching Pokémon types:', err)
+        );
     }, []);
 
     const handleSearch = (query) => {
-        // Filter Pokémon by name
         const filtered = pokemonList.filter((pokemon) =>
             pokemon.name.toLowerCase().includes(query.toLowerCase())
         );
@@ -39,25 +62,52 @@ const Home = () => {
         setSearchParams({ page: 1 }); // Reset to the first page after search
     };
 
-    // Pagination handlers
-    const handlePageChange = (page) => {
-        setSearchParams({ page }); // Update the page in the URL
+    const handleSort = (option) => {
+        let sortedList = [...filteredPokemon];
+        if (option === 'name') {
+            sortedList.sort((a, b) => a.name.localeCompare(b.name));
+        }
+        setFilteredPokemon(sortedList);
     };
 
-    // Calculate paginated Pokémon
+    const handleFilter = (type) => {
+        if (!type) {
+            setFilteredPokemon(pokemonList); // Reset to full list
+        } else {
+            const filtered = pokemonList.filter((pokemon) =>
+                pokemon.types.includes(type)
+            );
+            setFilteredPokemon(filtered);
+        }
+    };
+
+    const handleClear = () => {
+        setFilteredPokemon(pokemonList);
+        setSearchParams({ page: 1 });
+    };
+
+    const handlePageChange = (page) => {
+        setSearchParams({ page });
+    };
+
     const startIndex = (currentPage - 1) * pokemonsPerPage;
     const paginatedPokemon = filteredPokemon.slice(
         startIndex,
         startIndex + pokemonsPerPage
     );
 
-    // Total number of pages
     const totalPages = Math.ceil(filteredPokemon.length / pokemonsPerPage);
 
     return (
         <div className="home">
             {/* Add the Search Bar */}
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar
+                onSearch={handleSearch}
+                onSort={handleSort}
+                onFilter={handleFilter}
+                onClear={handleClear}
+                types={pokemonTypes} // Pass types to SearchBar
+            />
 
             {/* Pokémon Grid */}
             <div className="pokemon-grid">
