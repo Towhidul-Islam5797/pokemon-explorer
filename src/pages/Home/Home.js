@@ -9,7 +9,7 @@ const Home = () => {
     const [filteredPokemon, setFilteredPokemon] = useState([]);
     const [pokemonTypes, setPokemonTypes] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
-    const pokemonsPerPage = 104;
+    const pokemonsPerPage = 108;
 
     const currentPage = parseInt(searchParams.get('page')) || 1;
 

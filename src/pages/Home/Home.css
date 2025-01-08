@@ -5,15 +5,14 @@
 
 .pokemon-grid {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    /* 10 columns per row */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* Dynamically fit cards */
     gap: 20px;
     /* Space between cards */
     margin: 20px 0;
     justify-content: center;
-    /* Center grid content */
+    padding: 10px;
 }
-
 
 .pokemon-card:hover {
     transform: translateY(-5px);
@@ -78,4 +77,40 @@
 
 .pagination button.active {
     background-color: #2196f3;
+}
+
+.pokemon-image {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    /* Maintain aspect ratio */
+}
+
+.pokemon-name {
+    font-size: 1rem;
+    text-transform: capitalize;
+    color: #333;
+    text-align: center;
+}
+
+.pokemon-id {
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.view-details-btn {
+    padding: 8px 15px;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.view-details-btn:hover {
+    background: linear-gradient(to right, #2575fc, #6a11cb);
+    transform: scale(1.05);
+    /* Zoom effect */
 }

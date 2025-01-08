@@ -11,8 +11,7 @@
     transition: transform 0.3s ease;
     height: 250px;
     /* Ensure all cards have the same height */
-    width: 160px;
-    /* Ensure all cards have the same width */
+    
     overflow: hidden;
     /* Prevent any overflow */
 }
