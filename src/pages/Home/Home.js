@@ -8,6 +8,7 @@ const Home = () => {
     const [pokemonList, setPokemonList] = useState([]);
     const [filteredPokemon, setFilteredPokemon] = useState([]);
     const [pokemonTypes, setPokemonTypes] = useState([]);
+    const [notFoundMessage, setNotFoundMessage] = useState(''); // Track not-found message
     const [searchParams, setSearchParams] = useSearchParams();
     const pokemonsPerPage = 108;
 
@@ -21,7 +22,6 @@ const Home = () => {
             );
             const data = await response.json();
 
-            // Fetch additional details for each Pokémon
             const detailedPokemonList = await Promise.all(
                 data.results.map(async (pokemon) => {
                     const detailsResponse = await fetch(pokemon.url);
@@ -43,7 +43,7 @@ const Home = () => {
             const response = await fetch(`https://pokeapi.co/api/v2/type`);
             const data = await response.json();
             const types = data.results.map((type) => type.name);
-            setPokemonTypes(types.filter((type) => type !== "unknown")); // Exclude "unknown" type
+            setPokemonTypes(types.filter((type) => type !== 'unknown')); // Exclude "unknown" type
         };
 
         fetchAllPokemon().catch((err) =>
@@ -55,6 +55,7 @@ const Home = () => {
     }, []);
 
     const handleSearch = async (query) => {
+        setNotFoundMessage(''); // Clear any previous not-found message
         if (!query.trim()) {
             setFilteredPokemon(pokemonList); // Reset to the full list for empty queries
             return;
@@ -64,8 +65,8 @@ const Home = () => {
             // Fetch Pokémon species by name
             const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${query.toLowerCase()}`);
             if (!response.ok) {
-                console.error('Pokémon not found.');
-                setFilteredPokemon([]); // Clear the results if Pokémon is not found
+                setNotFoundMessage(`Sorry, '${query}' not found.`); // Set the not-found message
+                setFilteredPokemon([]);
                 return;
             }
             const speciesData = await response.json();
@@ -73,7 +74,7 @@ const Home = () => {
             // Fetch detailed Pokémon data for the species
             const detailsResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${speciesData.name}`);
             if (!detailsResponse.ok) {
-                console.error('Error fetching Pokémon details.');
+                setNotFoundMessage(`Sorry, '${query}' not found.`);
                 setFilteredPokemon([]);
                 return;
             }
@@ -87,11 +88,11 @@ const Home = () => {
                 types: detailsData.types.map((type) => type.type.name),
             };
 
-            // Update filtered Pokémon list with the single result
-            setFilteredPokemon([pokemonDetails]);
+            setFilteredPokemon([pokemonDetails]); // Update filtered Pokémon list with the result
             setSearchParams({ page: 1 }); // Reset to the first page after search
         } catch (error) {
             console.error('Error during search:', error);
+            setNotFoundMessage(`Sorry, '${query}' not found.`);
             setFilteredPokemon([]); // Clear results if there's an error
         }
     };
@@ -105,6 +106,7 @@ const Home = () => {
     };
 
     const handleFilter = (type) => {
+        setNotFoundMessage(''); // Clear not-found message for filters
         if (!type) {
             setFilteredPokemon(pokemonList); // Reset to full list
         } else {
@@ -116,6 +118,7 @@ const Home = () => {
     };
 
     const handleClear = () => {
+        setNotFoundMessage(''); // Clear not-found message
         setFilteredPokemon(pokemonList);
         setSearchParams({ page: 1 });
     };
@@ -142,6 +145,9 @@ const Home = () => {
                 onClear={handleClear}
                 types={pokemonTypes} // Pass types to SearchBar
             />
+
+            {/* Display Not-Found Message */}
+            {notFoundMessage && <p className="not-found-message">{notFoundMessage}</p>}
 
             {/* Pokémon Grid */}
             <div className="pokemon-grid">
