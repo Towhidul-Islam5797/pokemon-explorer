@@ -3,13 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import './PokemonDetails.css';
 
 const PokemonDetails = () => {
-    const { name } = useParams(); // Get the Pokémon name or ID from the URL
+    const { name } = useParams(); // Get the Pokémon name from the URL
     const [pokemonDetails, setPokemonDetails] = useState(null);
     const [moves, setMoves] = useState([]);
     const [evolutionChain, setEvolutionChain] = useState([]);
     const [error, setError] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false); // State to track favorite status
-
+    const navigate = useNavigate();
 
     // Type color mapping
     const typeColors = {
@@ -32,19 +32,16 @@ const PokemonDetails = () => {
         steel: '#B7B7CE',
         fairy: '#D685AD',
     };
-    
 
     useEffect(() => {
         const fetchPokemonDetails = async () => {
             try {
-                // Fetch Pokémon details
                 const url = `https://pokeapi.co/api/v2/pokemon/${name}`;
                 const res = await fetch(url);
                 if (!res.ok) throw new Error('Pokemon not found');
                 const data = await res.json();
                 setPokemonDetails(data);
 
-                // Fetch detailed info for each move
                 const movesDetails = await Promise.all(
                     data.moves.map(async (move) => {
                         const moveResponse = await fetch(move.move.url);
@@ -60,8 +57,9 @@ const PokemonDetails = () => {
                         };
                     })
                 );
-
                 setMoves(movesDetails);
+
+                // Check if this Pokémon is already in favorites
                 const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
                 const alreadyFavorited = favorites.some((fav) => fav.name === data.name);
                 setIsFavorited(alreadyFavorited);
@@ -109,11 +107,14 @@ const PokemonDetails = () => {
     const handleToggleFavorite = () => {
         const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
         if (isFavorited) {
+            // Remove from favorites
             const updatedFavorites = favorites.filter((fav) => fav.name !== pokemonDetails.name);
             localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
         } else {
+            // Add to favorites
             const newFavorite = {
                 name: pokemonDetails.name,
+                id: pokemonDetails.id,
                 image: pokemonDetails.sprites.other['official-artwork'].front_default,
             };
             localStorage.setItem('favorites', JSON.stringify([...favorites, newFavorite]));
@@ -141,20 +142,25 @@ const PokemonDetails = () => {
 
     return (
         <div className="pokemon-details-container">
+            <button onClick={() => navigate(-1)} className="back-button">Back</button>
             <div className="pokemon-details">
-                <h1 className="pokemon-name">{pokemonDetails.name}</h1>
-                <p className="pokemon-id">#{pokemonDetails.id.toString().padStart(3, '0')}</p>
+                <div className="header">
+                    <h1 className="pokemon-name">
+                        {pokemonDetails.name}
+                        <button
+                            className={`favorite-button ${isFavorited ? 'favorited' : ''}`}
+                            onClick={handleToggleFavorite}
+                        >
+                            ♥
+                        </button>
+                    </h1>
+                    <p className="pokemon-id">#{pokemonDetails.id.toString().padStart(3, '0')}</p>
+                </div>
                 <img
                     src={sprites.other['official-artwork'].front_default}
                     alt={pokemonDetails.name}
                     className="pokemon-image"
                 />
-                <button
-                    className={`favorite-button ${isFavorited ? 'favorited' : ''}`}
-                    onClick={handleToggleFavorite}
-                >
-                    ♥
-                </button>
 
                 <div className="details-grid">
                     <div className="details-row">
@@ -225,7 +231,7 @@ const PokemonDetails = () => {
             </div>
 
             <div className="moves-details">
-                <h1 className='movesets'>Movesets</h1>
+                <h1 className="movesets">Movesets</h1>
                 <table className="moves-table">
                     <thead>
                         <tr>
