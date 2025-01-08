@@ -1,4 +1,5 @@
 {
+  "homepage": "https://Towhidul-Islam5797.github.io/pokemon-explorer",
   "name": "pokemon-explorer",
   "version": "0.1.0",
   "private": true,
@@ -56,7 +57,6 @@
   "bugs": {
     "url": "https://github.com/Towhidul-Islam5797/pokemon-explorer/issues"
   },
-  "homepage": "https://Towhidul-Islam5797.github.io/pokemon-explorer",
   "devDependencies": {
     "gh-pages": "^6.3.0"
   }
