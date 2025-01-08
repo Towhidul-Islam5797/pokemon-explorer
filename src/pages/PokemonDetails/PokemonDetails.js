@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { saveAs } from 'file-saver'; // Import file-saver
 import './PokemonDetails.css';
 
 const PokemonDetails = () => {
@@ -8,7 +9,6 @@ const PokemonDetails = () => {
     const [moves, setMoves] = useState([]);
     const [evolutionChain, setEvolutionChain] = useState([]);
     const [error, setError] = useState(false);
-    const [isFavorited, setIsFavorited] = useState(false); // State to track favorite status
     const navigate = useNavigate();
 
     // Type color mapping
@@ -58,11 +58,6 @@ const PokemonDetails = () => {
                     })
                 );
                 setMoves(movesDetails);
-
-                // Check if this Pokémon is already in favorites
-                const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-                const alreadyFavorited = favorites.some((fav) => fav.name === data.name);
-                setIsFavorited(alreadyFavorited);
             } catch (err) {
                 console.error('Error fetching Pokémon details:', err);
                 setError(true);
@@ -104,22 +99,17 @@ const PokemonDetails = () => {
         fetchEvolutionChain();
     }, [name]);
 
-    const handleToggleFavorite = () => {
-        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        if (isFavorited) {
-            // Remove from favorites
-            const updatedFavorites = favorites.filter((fav) => fav.name !== pokemonDetails.name);
-            localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-        } else {
-            // Add to favorites
-            const newFavorite = {
-                name: pokemonDetails.name,
+    const handleSaveAsFavorite = () => {
+        if (pokemonDetails) {
+            const jsonData = JSON.stringify({
                 id: pokemonDetails.id,
-                image: pokemonDetails.sprites.other['official-artwork'].front_default,
-            };
-            localStorage.setItem('favorites', JSON.stringify([...favorites, newFavorite]));
+                name: pokemonDetails.name,
+                urlById: `https://pokeapi.co/api/v2/pokemon/${pokemonDetails.id}`,
+                urlByName: `https://pokeapi.co/api/v2/pokemon/${pokemonDetails.name}`,
+            });
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            saveAs(blob, `${pokemonDetails.name}_favorite.json`);
         }
-        setIsFavorited(!isFavorited);
     };
 
     if (error) {
@@ -144,18 +134,8 @@ const PokemonDetails = () => {
         <div className="pokemon-details-container">
             <button onClick={() => navigate(-1)} className="back-button">Back</button>
             <div className="pokemon-details">
-                <div className="header">
-                    <h1 className="pokemon-name">
-                        {pokemonDetails.name}
-                        <button
-                            className={`favorite-button ${isFavorited ? 'favorited' : ''}`}
-                            onClick={handleToggleFavorite}
-                        >
-                            ♥
-                        </button>
-                    </h1>
-                    <p className="pokemon-id">#{pokemonDetails.id.toString().padStart(3, '0')}</p>
-                </div>
+                <h1 className="pokemon-name">{pokemonDetails.name}</h1>
+                <p className="pokemon-id">#{pokemonDetails.id.toString().padStart(3, '0')}</p>
                 <img
                     src={sprites.other['official-artwork'].front_default}
                     alt={pokemonDetails.name}
@@ -227,6 +207,12 @@ const PokemonDetails = () => {
                             <p>No evolution chain available.</p>
                         )}
                     </div>
+                </div>
+                {/* Add to Favorites Button */}
+                <div className="details-row">
+                    <button onClick={handleSaveAsFavorite} className="save-favorite-button">
+                        Add to Favorites
+                    </button>
                 </div>
             </div>
 
