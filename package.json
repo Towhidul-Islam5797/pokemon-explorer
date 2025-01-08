@@ -21,7 +21,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -54,5 +56,8 @@
   "bugs": {
     "url": "https://github.com/Towhidul-Islam5797/pokemon-explorer/issues"
   },
-  "homepage": "https://github.com/Towhidul-Islam5797/pokemon-explorer#readme"
+  "homepage": "https://Towhidul-Islam5797.github.io/pokemon-explorer",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
 }
