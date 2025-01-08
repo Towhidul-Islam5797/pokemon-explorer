@@ -9,6 +9,12 @@ const SearchBar = ({ onSearch, onSort, onFilter, onClear, types }) => {
         onSearch(query);
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch(); // Trigger search on Enter key
+        }
+    };
+
     const handleSortChange = (e) => {
         onSort(e.target.value);
     };
@@ -33,6 +39,7 @@ const SearchBar = ({ onSearch, onSort, onFilter, onClear, types }) => {
                 placeholder="Search Pokémon"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyDown} // Listen for Enter key press
             />
             <button className="search-button" onClick={handleSearch}>
                 Search

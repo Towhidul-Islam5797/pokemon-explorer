@@ -54,12 +54,46 @@ const Home = () => {
         );
     }, []);
 
-    const handleSearch = (query) => {
-        const filtered = pokemonList.filter((pokemon) =>
-            pokemon.name.toLowerCase().includes(query.toLowerCase())
-        );
-        setFilteredPokemon(filtered);
-        setSearchParams({ page: 1 }); // Reset to the first page after search
+    const handleSearch = async (query) => {
+        if (!query.trim()) {
+            setFilteredPokemon(pokemonList); // Reset to the full list for empty queries
+            return;
+        }
+
+        try {
+            // Fetch Pokémon species by name
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${query.toLowerCase()}`);
+            if (!response.ok) {
+                console.error('Pokémon not found.');
+                setFilteredPokemon([]); // Clear the results if Pokémon is not found
+                return;
+            }
+            const speciesData = await response.json();
+
+            // Fetch detailed Pokémon data for the species
+            const detailsResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${speciesData.name}`);
+            if (!detailsResponse.ok) {
+                console.error('Error fetching Pokémon details.');
+                setFilteredPokemon([]);
+                return;
+            }
+            const detailsData = await detailsResponse.json();
+
+            // Format the Pokémon data
+            const pokemonDetails = {
+                name: detailsData.name,
+                url: `https://pokeapi.co/api/v2/pokemon/${detailsData.id}`,
+                id: detailsData.id,
+                types: detailsData.types.map((type) => type.type.name),
+            };
+
+            // Update filtered Pokémon list with the single result
+            setFilteredPokemon([pokemonDetails]);
+            setSearchParams({ page: 1 }); // Reset to the first page after search
+        } catch (error) {
+            console.error('Error during search:', error);
+            setFilteredPokemon([]); // Clear results if there's an error
+        }
     };
 
     const handleSort = (option) => {
